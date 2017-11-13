@@ -1,7 +1,6 @@
 "use strict";
 
 const crypto = require('crypto');
-
 const aesjs = require('aes-js');
 const NodeRSA = require('node-rsa');
 const randomstring = require("randomstring");

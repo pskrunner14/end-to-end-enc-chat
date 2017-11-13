@@ -2,10 +2,7 @@
 
 // SECURITY_LEVEL is the encryption key size in bits
 var SECURITY_LEVEL = 2048;
-// internet explorer can't handle 2048 bit key generation in a reasonable amount of time, so we use 1024 bit.
-//   this will have minimal impact as the credentials are secured using an externally transmitted verification
-//   code and cracking the client->server comms won't (usually) compromise server->client comms
-//   if client->server comms being compromised is a serious problem, then simply force the user to wait
+
 if ((window.navigator.userAgent.indexOf('MSIE') > 0) ||
     (window.navigator.userAgent.indexOf('Trident/7') > 0) ||
     (window.navigator.userAgent.indexOf('Edge/') > 0)) {
