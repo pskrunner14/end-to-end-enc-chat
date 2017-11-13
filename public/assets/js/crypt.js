@@ -50,7 +50,7 @@ function loadEncryptionObjects(serverPublicKey) {
     sessionKeys.server.public = serverPublicKey;
     // store sessionKeys in html storage
     if (typeof(Storage) !== "undefined") {
-        sessionStorage.RSAKeys = JSON.stringify(rsa.keys);
+        sessionStorage.RSAKeys = JSON.stringify(sessionKeys);
         console.log('session key stored: ' + sessionStorage.RSAKeys);
     }
 
