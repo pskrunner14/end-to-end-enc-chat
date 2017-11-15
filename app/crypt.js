@@ -5,6 +5,7 @@ const aesjs = require('aes-js');
 const NodeRSA = require('node-rsa');
 const randomstring = require("randomstring");
 
+// SECURITY_LEVEL is the encryption key size in bits
 const SECURITY_LEVEL = 2048;
 
 const aes = {
