@@ -7,24 +7,31 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>END TO END ENCRYPTION | Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="assets/css/main.css">
-    <script src="assets/js/lib/socket.io.js"></script>
     <script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
     <script type="text/javascript" src="assets/js/lib/md5.min.js"></script>
     <script type="text/javascript" src="assets/js/lib/jsencrypt.min.js"></script>
-    <script src="assets/js/crypt.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script type="text/javascript" src="assets/js/crypt.js"></script>
+    <script type="text/javascript" src="assets/js/lib/socket.io.js"></script>
 </head>
 
 <body>
 
-    <h2>CHAT WITH END TO END ENCRYPTION</h2>
+    <div id="main-chat">
+        <h2>End to End Encryption Chat</h2>
+        <div id="chat-window">
+            <div id="output"></div>
+            <div id="feedback"></div>
+        </div>
+        <input id="handle" type="text" placeholder="Handle" />
+        <input id="message" type="text" placeholder="Message" />
+        <button id="send">Send</button>
+    </div>
 
-    <script type="text/javascript">
-        console.log(document.cookie);
-    </script>
-    <script src="assets/js/lib/jquery.min.js"></script>
-    <script src="assets/js/main.js"></script>
+    <script type="text/javascript" src="assets/js/lib/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/app.js"></script>
+
 </body>
 
 </html>

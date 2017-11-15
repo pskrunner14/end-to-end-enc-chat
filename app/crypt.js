@@ -102,7 +102,5 @@ const unpack = function(data) {
 module.exports = {
     pack: pack,
     unpack: unpack,
-    aes: aes,
-    rsa: rsa,
-    generateSessionSecret: generateSessionSecret
+    generateKeys: rsa.generateKeys
 };

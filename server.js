@@ -9,27 +9,16 @@ const socketIO = require('socket.io');
 const session = require('express-session');
 const fs = require('fs');
 
+const { generateKeys } = require('./app/crypt');
+
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
-const getKeys = function(callback) {
-    fs.readFile(__dirname + '.keys/end_to_end.key', function(err, serverPrivateKey) {
-        if (err) {
-            return gracefullyShutdown('Error reading server private key', err);
-        }
-        process.env.SERVER_PRIVATE_KEY = serverPrivateKey;
-        fs.readFile(__dirname + '.keys/end_to_end.pub', function(err, clientPublicKey) {
-            if (err) {
-                return gracefullyShutdown('Error reading client public key', err);
-            }
-            process.env.CLIENT_PUBLIC_KEY = clientPublicKey;
-            console.log('Keys successfully initialized');
-        });
-    });
-};
+const keys = generateKeys();
 
-getKeys();
+process.SERVER_PUBLIC_KEY = keys.public;
+process.SERVER_PRIVATE_KEY = keys.private;
 
 const session_config = {
     secret: process.env.SESSION_SECRET,

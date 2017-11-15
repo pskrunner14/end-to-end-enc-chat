@@ -13,6 +13,7 @@
         "JSEncrypt": true,
         "rsa": true,
         "md5": true,
-        "aesjs": true
+        "aesjs": true,
+        "io": true
     }
 }

@@ -56,10 +56,10 @@ function loadEncryptionObjects(serverPublicKey) {
 
     // server's public key is used to encrypt AES secrets
     encrypter = new JSEncrypt();
-    encrypter.setPublicKey(sessionKeys.server.public);
+    encrypter.setKey(sessionKeys.server.public);
     // client's private key is used to decrypt AES secrets
     decrypter = new JSEncrypt();
-    decrypter.setPrivateKey(sessionKeys.client.private);
+    decrypter.setKey(sessionKeys.client.private);
 }
 
 // load existing session keys from storage or generate new keys
@@ -87,8 +87,8 @@ var aes = {
     encrypt: function(secret, text) {
         // hash secret to 256 bit (32 byte) key using md5
         var secretHash = md5(secret);
-        var key = aesjs.util.convertStringToBytes(secretHash);
-        var textBytes = aesjs.util.convertStringToBytes(text);
+        var key = aesjs.utils.utf8.toBytes(secretHash);
+        var textBytes = aesjs.utils.utf8.toBytes(text);
         var aesCtr = new aesjs.ModeOfOperation.ctr(key);
         var encryptedBytes = aesCtr.encrypt(textBytes);
         return encryptedBytes;
@@ -101,10 +101,10 @@ var aes = {
         }
         // hash secret to 256 bit (32 byte) key
         var secretHash = md5(secret);
-        var key = aesjs.util.convertStringToBytes(secretHash);
+        var key = aesjs.utils.utf8.toBytes(secretHash);
         var aesCtr = new aesjs.ModeOfOperation.ctr(key);
         var decryptedBytes = aesCtr.decrypt(encryptedBytes);
-        return aesjs.util.convertBytesToString(decryptedBytes);
+        return aesjs.utils.utf8.fromBytes(decryptedBytes);
     },
 
     generateKey: function() {
@@ -119,6 +119,7 @@ function packMessageData(data) {
     try {
         // add encrypted aes key to output
         packedData.key = encrypter.encrypt(aesKey);
+        console.log(packedData.key);
         // add encrypted data to output
         packedData.encrypted = aes.encrypt(aesKey, JSON.stringify(data));
         return packedData;

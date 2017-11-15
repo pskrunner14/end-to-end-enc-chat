@@ -1,6 +1,6 @@
 "use strict";
 
-const crypt = require('./crypt');
+const { pack, unpack } = require('./crypt');
 const moment = require('moment');
 
 module.exports = function(io) {
@@ -25,15 +25,29 @@ module.exports = function(io) {
             updateUsers();
         });
 
-        socket.on('disconnect', () => {
-            const sockets = users[socket.user_id];
-            sockets.splice(sockets.indexOf(socket.id), 1);
-            console.log(`User disconnected: ${socket.user_id}`);
-            updateUsers();
+        socket.on('init-session', (data) => {
+            if (data.status) {
+                process.env.CLIENT_PUBLIC_KEY = data.key;
+                socket.emit('init-session', {
+                    status: true,
+                    key: process.env.SERVER_PUBLIC_KEY
+                });
+            }
         });
 
-        socket.on('message', (data) => {
+        // socket.on('disconnect', () => {
+        //     const sockets = users[socket.user_id];
+        //     sockets.splice(sockets.indexOf(socket.id), 1);
+        //     console.log(`User disconnected: ${socket.user_id}`);
+        //     updateUsers();
+        // });
 
+        socket.on('message', (data) => {
+            console.log(unpack(data));
+        });
+
+        socket.on('typing', (data) => {
+            console.log(unpack(data));
         });
     });
 
