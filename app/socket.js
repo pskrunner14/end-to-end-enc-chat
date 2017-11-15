@@ -17,7 +17,7 @@ module.exports = function(io) {
         console.log(`Made socket connection: ${socket.id}`);
 
         sockets[socket.id] = "";
-        console.log(Object.keys(sockets));
+        console.log('sockets: ' + Object.keys(sockets));
 
         socket.on('init-session', (data) => {
             if (data.status) {
@@ -32,6 +32,7 @@ module.exports = function(io) {
         socket.on('disconnect', () => {
             delete sockets[socket.id];
             console.log(`Socket disconnected: ${socket.id}`);
+            console.log('sockets: ' + Object.keys(sockets));
         });
 
         socket.on('message', (data) => {

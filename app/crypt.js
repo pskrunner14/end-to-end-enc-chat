@@ -58,20 +58,6 @@ const rsa = {
     }
 };
 
-// generate shared secret for session authentication
-const generateSessionSecret = function() {
-    // number between 4 and 8
-    const secretLength = Math.floor((Math.random() * 5) + 4);
-
-    // secret should not include ambiguous characters like O/0, 1/l
-    const secret = randomstring.generate({
-        length: secretLength,
-        charset: '23456789abcdefghijkmnpqrstuvwxyz'
-    });
-
-    return secret;
-};
-
 // generate PEM formatted public / private key pair
 const generateKeys = function() {
     const key = new NodeRSA({ b: SECURITY_LEVEL });
@@ -107,6 +93,5 @@ const unpack = function(data) {
 module.exports = {
     pack: pack,
     unpack: unpack,
-    generateKeys: generateKeys,
-    generateSessionSecret: generateSessionSecret
+    generateKeys: generateKeys
 };
