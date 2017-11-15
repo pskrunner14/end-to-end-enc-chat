@@ -10,8 +10,8 @@ const SECURITY_LEVEL = 2048;
 const aes = {
     encrypt: function(secret, text) {
         const secretHash = crypto.createHash('md5').update(secret).digest("hex");
-        const key = aesjs.util.convertStringToBytes(secretHash);
-        const textBytes = aesjs.util.convertStringToBytes(text);
+        const key = aesjs.utils.utf8.toBytes(secretHash);
+        const textBytes = aesjs.utils.utf8.toBytes(text);
         const aesCtr = new aesjs.ModeOfOperation.ctr(key);
         const encryptedBytes = aesCtr.encrypt(textBytes);
         return encryptedBytes;
@@ -19,14 +19,42 @@ const aes = {
 
     decrypt: function(secret, encryptedBytes) {
         const secretHash = crypto.createHash('md5').update(secret).digest("hex");
-        const key = aesjs.util.convertStringToBytes(secretHash);
+        const key = aesjs.utils.utf8.toBytes(secretHash);
         const aesCtr = new aesjs.ModeOfOperation.ctr(key);
         const decryptedBytes = aesCtr.decrypt(encryptedBytes);
-        return aesjs.util.convertBytesToString(decryptedBytes);
+        return aesjs.utils.utf8.fromBytes(decryptedBytes);
     },
 
     generateKey: function() {
         return crypto.createHash('md5').update(randomstring.generate()).digest("hex");
+    }
+};
+
+const rsa = {
+    // both parameters must be strings, publicKey PEM formatted
+    encrypt: function(clientPublicKey, message) {
+        const buffer = new Buffer(message);
+        // padding type must be compatible with client-side packages
+        const encrypted = crypto.publicEncrypt({
+                key: clientPublicKey,
+                padding: crypto.constants.RSA_PKCS1_PADDING
+            },
+            buffer
+        );
+        return encrypted.toString('base64');
+    },
+
+    // both parameters must be strings, publicKey PEM formatted
+    decrypt: function(message) {
+        const buffer = new Buffer(message, 'base64');
+        // padding type must be compatible with client-side packages
+        const decrypted = crypto.privateDecrypt({
+                key: process.env.SERVER_PRIVATE_KEY,
+                padding: crypto.constants.RSA_PKCS1_PADDING
+            },
+            buffer
+        );
+        return decrypted.toString('utf8');
     }
 };
 
@@ -44,63 +72,41 @@ const generateSessionSecret = function() {
     return secret;
 };
 
-const rsa = {
-    // both parameters must be strings, publicKey PEM formatted
-    encrypt: function(publicKey, message) {
-        const buffer = new Buffer(message);
-        // padding type must be compatible with client-side packages
-        const encrypted = crypto.publicEncrypt({
-                key: publicKey,
-                padding: crypto.constants.RSA_PKCS1_PADDING
-            },
-            buffer
-        );
-        return encrypted.toString('base64');
-    },
+// generate PEM formatted public / private key pair
+const generateKeys = function() {
+    const key = new NodeRSA({ b: SECURITY_LEVEL });
 
-    // both parameters must be strings, publicKey PEM formatted
-    decrypt: function(privateKey, message) {
-        const buffer = new Buffer(message, 'base64');
-        // padding type must be compatible with client-side packages
-        const decrypted = crypto.privateDecrypt({
-                key: privateKey,
-                padding: crypto.constants.RSA_PKCS1_PADDING
-            },
-            buffer
-        );
-        return decrypted.toString('utf8');
-    },
-
-    // generate PEM formatted public / private key pair
-    generateKeys: function() {
-        const key = new NodeRSA({ b: SECURITY_LEVEL });
-
-        // formatting must be compatible with client-side packages
-        return {
-            'private': key.exportKey('pkcs1-private-pem'),
-            'public': key.exportKey('pkcs8-public-pem')
-        };
-    }
+    // formatting must be compatible with client-side packages
+    return {
+        'private': key.exportKey('pkcs1-private-pem'),
+        'public': key.exportKey('pkcs8-public-pem')
+    };
 };
 
-const pack = function(data) {
+const pack = function(clientPublicKey, data) {
     const packedData = {};
     // generate aes key
     const aesKey = aes.generateKey();
     // add encrypted aes key to output
-    packedData.key = rsa.encrypt(process.env.CLIENT_PUBLIC_KEY, aesKey);
+    packedData.key = rsa.encrypt(clientPublicKey, aesKey);
     // add encrypted data to output
     packedData.encrypted = aes.encrypt(aesKey, JSON.stringify(data));
     return packedData;
 };
 
 const unpack = function(data) {
-    const aesKey = rsa.decrypt(process.env.SERVER_PRIVATE_KEY, data.key);
-    return aes.decrypt(aesKey, data.encrypted);
+    const aesKey = rsa.decrypt(data.key);
+    var encryptedData = [];
+    var keys = Object.keys(data.encrypted);
+    for (var i = 0; i < keys.length; i++) {
+        encryptedData[i] = data.encrypted[keys[i]];
+    }
+    return aes.decrypt(aesKey, new Uint8Array(encryptedData));
 };
 
 module.exports = {
     pack: pack,
     unpack: unpack,
-    generateKeys: rsa.generateKeys
+    generateKeys: generateKeys,
+    generateSessionSecret: generateSessionSecret
 };

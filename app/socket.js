@@ -1,33 +1,27 @@
 "use strict";
 
 const { pack, unpack } = require('./crypt');
-const moment = require('moment');
 
 module.exports = function(io) {
 
     /**
      * Active users record
      * users: {
-     *     user_id: [ socket_id_1, socket_id_2 ]
+     *     socket_id: socket_client_public_key
      * }
-     * Key value pairs of user_id and the socket_ids of the sockets they are connected on.
      */
-    const users = {};
+    const sockets = {};
 
     io.on('connection', (socket) => {
 
         console.log(`Made socket connection: ${socket.id}`);
 
-        socket.on('join', (user_id, available) => {
-            available(true);
-            socket.user_id = user_id;
-            users[user_id].push(socket.id);
-            updateUsers();
-        });
+        sockets[socket.id] = "";
+        console.log(Object.keys(sockets));
 
         socket.on('init-session', (data) => {
             if (data.status) {
-                process.env.CLIENT_PUBLIC_KEY = data.key;
+                sockets[socket.id] = data.key;
                 socket.emit('init-session', {
                     status: true,
                     key: process.env.SERVER_PUBLIC_KEY
@@ -35,23 +29,24 @@ module.exports = function(io) {
             }
         });
 
-        // socket.on('disconnect', () => {
-        //     const sockets = users[socket.user_id];
-        //     sockets.splice(sockets.indexOf(socket.id), 1);
-        //     console.log(`User disconnected: ${socket.user_id}`);
-        //     updateUsers();
-        // });
+        socket.on('disconnect', () => {
+            delete sockets[socket.id];
+            console.log(`Socket disconnected: ${socket.id}`);
+        });
 
         socket.on('message', (data) => {
-            console.log(unpack(data));
+            var keys = Object.keys(sockets);
+            for (var i = 0; i < keys.length; i++) {
+                socket.to(keys[i]).emit('message', pack(sockets[keys[i]], unpack(data)));
+            }
+            socket.emit('message', pack(sockets[socket.id], unpack(data)));
         });
 
         socket.on('typing', (data) => {
-            console.log(unpack(data));
+            var keys = Object.keys(sockets);
+            for (var i = 0; i < keys.length; i++) {
+                socket.to(keys[i]).emit('typing', pack(sockets[keys[i]], unpack(data)));
+            }
         });
     });
-
-    function updateUsers() {
-        io.emit('online_users', users);
-    }
 };

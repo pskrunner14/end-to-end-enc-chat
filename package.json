@@ -1,36 +1,35 @@
 {
-  "name": "end-to-end-enc-chat",
-  "version": "1.0.0",
-  "description": "Chat app with end-to-end encryption",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pskrunner14/end-to-end-enc-chat.git"
-  },
-  "keywords": [],
-  "author": "Prabhsimran Singh <pskrunner14@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/pskrunner14/end-to-end-enc-chat/issues"
-  },
-  "homepage": "https://github.com/pskrunner14/end-to-end-enc-chat#readme",
-  "dependencies": {
-    "aes-js": "^3.1.0",
-    "body-parser": "^1.18.2",
-    "dotenv": "^4.0.0",
-    "express": "^4.16.2",
-    "express-session": "^1.15.6",
-    "moment": "^2.19.2",
-    "morgan": "^1.9.0",
-    "node-rsa": "^0.4.2",
-    "randomstring": "^1.1.5",
-    "socket.io": "^2.0.4"
-  },
-  "devDependencies": {
-    "nodemon": "^1.12.1"
-  }
+    "name": "end-to-end-enc-chat",
+    "version": "1.0.0",
+    "description": "Chat app with end-to-end encryption",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pskrunner14/end-to-end-enc-chat.git"
+    },
+    "keywords": [],
+    "author": "Prabhsimran Singh <pskrunner14@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/pskrunner14/end-to-end-enc-chat/issues"
+    },
+    "homepage": "https://github.com/pskrunner14/end-to-end-enc-chat#readme",
+    "dependencies": {
+        "aes-js": "^3.1.0",
+        "body-parser": "^1.18.2",
+        "dotenv": "^4.0.0",
+        "express": "^4.16.2",
+        "express-session": "^1.15.6",
+        "morgan": "^1.9.0",
+        "node-rsa": "^0.4.2",
+        "randomstring": "^1.1.5",
+        "socket.io": "^2.0.4"
+    },
+    "devDependencies": {
+        "nodemon": "^1.12.1"
+    }
 }

@@ -95,15 +95,16 @@ var aes = {
     },
 
     decrypt: function(secret, encryptedBytes) {
-        // convert node.js buffer object to byte array
-        if (encryptedBytes.type && (encryptedBytes.type == "Buffer")) {
-            encryptedBytes = encryptedBytes.data;
+        var encryptedData = [];
+        var keys = Object.keys(encryptedBytes);
+        for (var i = 0; i < keys.length; i++) {
+            encryptedData[i] = encryptedBytes[keys[i]];
         }
         // hash secret to 256 bit (32 byte) key
         var secretHash = md5(secret);
         var key = aesjs.utils.utf8.toBytes(secretHash);
         var aesCtr = new aesjs.ModeOfOperation.ctr(key);
-        var decryptedBytes = aesCtr.decrypt(encryptedBytes);
+        var decryptedBytes = aesCtr.decrypt(encryptedData);
         return aesjs.utils.utf8.fromBytes(decryptedBytes);
     },
 
@@ -112,14 +113,13 @@ var aes = {
     }
 };
 
-function packMessageData(data) {
+function pack(data) {
     var packedData = {};
     // generate aes key
     var aesKey = aes.generateKey();
     try {
         // add encrypted aes key to output
         packedData.key = encrypter.encrypt(aesKey);
-        console.log(packedData.key);
         // add encrypted data to output
         packedData.encrypted = aes.encrypt(aesKey, JSON.stringify(data));
         return packedData;
@@ -129,7 +129,7 @@ function packMessageData(data) {
     }
 }
 
-function unpackMessageData(data) {
-    var secret = decrypter.decrypt(data.key);
-    var message = JSON.parse(aes.decrypt(secret, data.encrypted));
+function unpack(data) {
+    var aesKey = decrypter.decrypt(data.key);
+    return JSON.parse(JSON.parse(aes.decrypt(aesKey, data.encrypted)));
 }

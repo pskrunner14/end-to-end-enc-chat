@@ -14,7 +14,7 @@ socket.emit('init-session', {
 });
 
 socket.on('init-session', (data) => {
-    loadEncryptionObjects(data);
+    loadEncryptionObjects(data.key);
 });
 
 // query dom
@@ -26,7 +26,7 @@ var feedback = document.querySelector('#feedback');
 
 // emit events
 button.addEventListener('click', () => {
-    var encryptedData = packMessageData({
+    var encryptedData = pack({
         message: message.value,
         handle: handle.value
     });
@@ -36,18 +36,20 @@ button.addEventListener('click', () => {
 });
 
 message.addEventListener('keypress', () => {
-    var encryptedData = packMessageData(handle.value);
-    console.log(encryptedData);
+    var encryptedData = pack({
+        handle: handle.value
+    });
     socket.emit('typing', encryptedData);
 });
 
 // listen for socket events
 socket.on('message', (data) => {
-    //console.log(unpackMessageData(data));
-    //feedback.innerHTML = '';
-    //output.innerHTML += `<p><strong>${data.handle}:</strong> ${data.message}</p>`;
+    var decryptedData = unpack(data);
+    feedback.innerHTML = '';
+    output.innerHTML += `<p><strong>${decryptedData.handle}:</strong> ${decryptedData.message}</p>`;
 });
 
 socket.on('typing', (data) => {
-    //feedback.innerHTML = `<p><em>${data} is typing a message...</em></p>`;
+    var decryptedData = unpack(data);
+    feedback.innerHTML = `<p><em>${decryptedData.handle} is typing a message...</em></p>`;
 });

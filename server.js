@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const socketIO = require('socket.io');
 const session = require('express-session');
 const fs = require('fs');
+const path = require('path');
 
 const { generateKeys } = require('./app/crypt');
 
@@ -17,8 +18,8 @@ const app = express();
 
 const keys = generateKeys();
 
-process.SERVER_PUBLIC_KEY = keys.public;
-process.SERVER_PRIVATE_KEY = keys.private;
+process.env.SERVER_PUBLIC_KEY = keys.public;
+process.env.SERVER_PRIVATE_KEY = keys.private;
 
 const session_config = {
     secret: process.env.SESSION_SECRET,
@@ -29,11 +30,15 @@ const session_config = {
     saveUninitialized: false
 };
 
-app.use(morgan('common'));
+app.use(morgan('dev'));
 app.use(session(session_config));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'index.html'));
+});
 
 const server = app.listen(PORT, () => {
     const HOST = server.address().address === '::' ? "localhost" : server.address().address;
