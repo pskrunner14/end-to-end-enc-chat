@@ -8,6 +8,12 @@ const randomstring = require("randomstring");
 // SECURITY_LEVEL is the encryption key size in bits
 const SECURITY_LEVEL = 2048;
 
+// used to generate a random md5 hash to create secret key
+const generateRandomKey = function() {
+    return crypto.createHash('md5').update(randomstring.generate()).digest("hex");
+};
+
+// used to encrypt and decrypt data using secret key
 const aes = {
     encrypt: function(secret, text) {
         const secretHash = crypto.createHash('md5').update(secret).digest("hex");
@@ -25,16 +31,16 @@ const aes = {
         const decryptedBytes = aesCtr.decrypt(encryptedBytes);
         return aesjs.utils.utf8.fromBytes(decryptedBytes);
     },
-
-    generateKey: function() {
-        return crypto.createHash('md5').update(randomstring.generate()).digest("hex");
-    }
 };
 
+// used to encrypt and decrypt md5 hash to
+// create secret key used by aes to encrypt data
 const rsa = {
+
     // both parameters must be strings, publicKey PEM formatted
     encrypt: function(clientPublicKey, message) {
         const buffer = new Buffer(message);
+
         // padding type must be compatible with client-side packages
         const encrypted = crypto.publicEncrypt({
                 key: clientPublicKey,
@@ -48,6 +54,7 @@ const rsa = {
     // both parameters must be strings, publicKey PEM formatted
     decrypt: function(message) {
         const buffer = new Buffer(message, 'base64');
+
         // padding type must be compatible with client-side packages
         const decrypted = crypto.privateDecrypt({
                 key: process.env.SERVER_PRIVATE_KEY,
@@ -70,23 +77,26 @@ const generateKeys = function() {
     };
 };
 
+// pack the data using the receiver's public key
 const pack = function(clientPublicKey, data) {
     const packedData = {};
     // generate aes key
-    const aesKey = aes.generateKey();
+    const aesKey = generateRandomKey();
     // add encrypted aes key to output
-    packedData.key = rsa.encrypt(clientPublicKey, aesKey);
+    packedData.secret = rsa.encrypt(clientPublicKey, aesKey);
     // add encrypted data to output
-    packedData.encrypted = aes.encrypt(aesKey, JSON.stringify(data));
+    packedData.data = aes.encrypt(aesKey, JSON.stringify(data));
     return packedData;
 };
 
+// unpack the encrypted data using secret key
 const unpack = function(data) {
-    const aesKey = rsa.decrypt(data.key);
+    // decrypt the secret key using server private key
+    const aesKey = rsa.decrypt(data.secret);
     var encryptedData = [];
-    var keys = Object.keys(data.encrypted);
+    var keys = Object.keys(data.data);
     for (var i = 0; i < keys.length; i++) {
-        encryptedData[i] = data.encrypted[keys[i]];
+        encryptedData[i] = data.data[keys[i]];
     }
     return aes.decrypt(aesKey, new Uint8Array(encryptedData));
 };

@@ -20,7 +20,6 @@ var encrypter, decrypter;
 function generateRandomString(length) {
     var text = "";
     var charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
     for (var i = 0; i < length; i++) {
         text += charset.charAt(Math.floor(Math.random() * charset.length));
     }
@@ -48,6 +47,7 @@ function generateSessionKeys() {
 // to be called after key exchange
 function loadEncryptionObjects(serverPublicKey) {
     sessionKeys.server.public = serverPublicKey;
+
     // store sessionKeys in html storage
     if (typeof(Storage) !== "undefined") {
         sessionStorage.RSAKeys = JSON.stringify(sessionKeys);
@@ -57,6 +57,7 @@ function loadEncryptionObjects(serverPublicKey) {
     // server's public key is used to encrypt AES secrets
     encrypter = new JSEncrypt();
     encrypter.setKey(sessionKeys.server.public);
+
     // client's private key is used to decrypt AES secrets
     decrypter = new JSEncrypt();
     decrypter.setKey(sessionKeys.client.private);
@@ -119,9 +120,9 @@ function pack(data) {
     var aesKey = aes.generateKey();
     try {
         // add encrypted aes key to output
-        packedData.key = encrypter.encrypt(aesKey);
+        packedData.secret = encrypter.encrypt(aesKey);
         // add encrypted data to output
-        packedData.encrypted = aes.encrypt(aesKey, JSON.stringify(data));
+        packedData.data = aes.encrypt(aesKey, JSON.stringify(data));
         return packedData;
     } catch (dataEncryptionException) {
         console.log('failed to pack message: ' + dataEncryptionException.message);
@@ -130,6 +131,6 @@ function pack(data) {
 }
 
 function unpack(data) {
-    var aesKey = decrypter.decrypt(data.key);
-    return JSON.parse(JSON.parse(aes.decrypt(aesKey, data.encrypted)));
+    var aesKey = decrypter.decrypt(data.secret);
+    return JSON.parse(JSON.parse(aes.decrypt(aesKey, data.data)));
 }
