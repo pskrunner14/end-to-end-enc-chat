@@ -4,12 +4,6 @@ const { pack, unpack } = require('./crypt');
 
 module.exports = function(io) {
 
-    /**
-     * Active users record
-     * users: {
-     *     socket_id: socket_client_public_key
-     * }
-     */
     const sockets = {};
 
     io.on('connection', (socket) => {
@@ -19,6 +13,7 @@ module.exports = function(io) {
         sockets[socket.id] = "";
         console.log('sockets: ' + Object.keys(sockets));
 
+        // session-initialization event
         socket.on('init-session', (data) => {
             if (data.status) {
                 sockets[socket.id] = data.key;
@@ -29,12 +24,14 @@ module.exports = function(io) {
             }
         });
 
+        // socket disconnect event listener
         socket.on('disconnect', () => {
             delete sockets[socket.id];
             console.log(`Socket disconnected: ${socket.id}`);
             console.log('sockets: ' + Object.keys(sockets));
         });
 
+        // message event listener
         socket.on('message', (data) => {
             var keys = Object.keys(sockets);
             for (var i = 0; i < keys.length; i++) {
@@ -43,6 +40,7 @@ module.exports = function(io) {
             socket.emit('message', pack(sockets[socket.id], unpack(data)));
         });
 
+        // typing event listener
         socket.on('typing', (data) => {
             var keys = Object.keys(sockets);
             for (var i = 0; i < keys.length; i++) {
