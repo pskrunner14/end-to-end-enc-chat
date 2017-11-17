@@ -83,20 +83,20 @@ const pack = function(clientPublicKey, data) {
     // generate aes key
     const aesKey = generateRandomKey();
     // add encrypted aes key to output
-    packedData.secret = rsa.encrypt(clientPublicKey, aesKey);
+    packedData.key = rsa.encrypt(clientPublicKey, aesKey);
     // add encrypted data to output
-    packedData.data = aes.encrypt(aesKey, JSON.stringify(data));
+    packedData.encrypted = aes.encrypt(aesKey, JSON.stringify(data));
     return packedData;
 };
 
 // unpack the encrypted data using secret key
 const unpack = function(data) {
     // decrypt the secret key using server private key
-    const aesKey = rsa.decrypt(data.secret);
+    const aesKey = rsa.decrypt(data.key);
     var encryptedData = [];
-    var keys = Object.keys(data.data);
+    var keys = Object.keys(data.encrypted);
     for (var i = 0; i < keys.length; i++) {
-        encryptedData[i] = data.data[keys[i]];
+        encryptedData[i] = data.encrypted[keys[i]];
     }
     return aes.decrypt(aesKey, new Uint8Array(encryptedData));
 };

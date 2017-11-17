@@ -67,7 +67,6 @@ function loadEncryptionObjects(serverPublicKey) {
 function loadSessionKeys() {
     // ensure html5 storage available
     if (typeof(Storage) !== "undefined") {
-
         if (sessionStorage.RSAKeys) {
             sessionKeys = JSON.parse(sessionStorage.RSAKeys);
             console.log('client keys loaded from session storage');
@@ -119,10 +118,10 @@ function pack(data) {
     // generate aes key
     var aesKey = aes.generateKey();
     try {
-        // add encrypted aes key to output
-        packedData.secret = encrypter.encrypt(aesKey);
+        // add encrypted aes-key to output as secret
+        packedData.key = encrypter.encrypt(aesKey);
         // add encrypted data to output
-        packedData.data = aes.encrypt(aesKey, JSON.stringify(data));
+        packedData.encrypted = aes.encrypt(aesKey, JSON.stringify(data));
         return packedData;
     } catch (dataEncryptionException) {
         console.log('failed to pack message: ' + dataEncryptionException.message);
@@ -131,6 +130,7 @@ function pack(data) {
 }
 
 function unpack(data) {
-    var aesKey = decrypter.decrypt(data.secret);
-    return JSON.parse(JSON.parse(aes.decrypt(aesKey, data.data)));
+    // decrypt the secret to get aes-key
+    var aesKey = decrypter.decrypt(data.key);
+    return JSON.parse(JSON.parse(aes.decrypt(aesKey, data.encrypted)));
 }

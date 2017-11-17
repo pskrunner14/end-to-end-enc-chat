@@ -9,8 +9,6 @@ module.exports = function(io) {
     io.on('connection', (socket) => {
 
         console.log(`Made socket connection: ${socket.id}`);
-
-        sockets[socket.id] = "";
         console.log('sockets: ' + Object.keys(sockets));
 
         // session-initialization event
