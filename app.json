@@ -1,0 +1,14 @@
+{
+    "name": "end-to-end-enc-chat",
+    "description": "Chat app with end-to-end encryption",
+    "repository": "https://github.com/pskrunner14/end-to-end-enc-chat",
+    "keywords": [
+        "node",
+        "express",
+        "socket.io",
+        "encryption",
+        "aes",
+        "rsa",
+        "end-to-end-encryption"
+    ]
+}

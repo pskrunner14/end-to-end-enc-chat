@@ -1,6 +1,6 @@
 {
     "name": "end-to-end-enc-chat",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Chat app with end-to-end encryption",
     "main": "server.js",
     "scripts": {
@@ -12,7 +12,10 @@
         "url": "git+https://github.com/pskrunner14/end-to-end-enc-chat.git"
     },
     "keywords": [],
-    "author": "Prabhsimran Singh <pskrunner14@gmail.com>",
+    "author": {
+        "name": "Prabhsimran Singh",
+        "email": "pskrunner14@gmail.com"
+    },
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/pskrunner14/end-to-end-enc-chat/issues"

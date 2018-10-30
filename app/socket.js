@@ -2,8 +2,7 @@
 
 const { pack, unpack } = require('./crypt');
 
-module.exports = function(io) {
-
+const socket_io = function (io) {
     const sockets = {};
 
     io.on('connection', (socket) => {
@@ -47,3 +46,5 @@ module.exports = function(io) {
         });
     });
 };
+
+module.exports = socket_io;
