@@ -11,7 +11,15 @@
         "type": "git",
         "url": "git+https://github.com/pskrunner14/end-to-end-enc-chat.git"
     },
-    "keywords": [],
+    "keywords": [
+        "node",
+        "express",
+        "socket.io",
+        "encryption",
+        "aes",
+        "rsa",
+        "end-to-end-encryption"
+    ],
     "author": {
         "name": "Prabhsimran Singh",
         "email": "pskrunner14@gmail.com"
